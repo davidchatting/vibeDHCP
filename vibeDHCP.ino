@@ -223,7 +223,7 @@ void setup() {
   xTaskCreate(dhcpServerTask, "dhcpServerTask", 4096, NULL, 1, NULL);
 
   server.onNotFound([]() {
-    server.send(200, "text/plain", "HELLO");
+    server.send(200, "text/plain", server.uri());
   });
   server.begin();
 
