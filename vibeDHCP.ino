@@ -1,5 +1,7 @@
 #include <WiFi.h>
+#include <DNSServer.h>
 #include <WebServer.h>
+
 #include <esp_netif.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -14,9 +16,10 @@ IPAddress offeredIP(192, 168, 4, 77);
 IPAddress netMsk(255, 255, 255, 0);
 byte clientMac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0x01 };
 
+DNSServer dnsServer;
 WebServer server(80);
 
-// --- MINIMAL DHCP SERVER CONFIG ---
+#define DNS_PORT 53
 #define DHCP_SERVER_PORT 67
 #define DHCP_CLIENT_PORT 68
 
@@ -213,8 +216,8 @@ void setup() {
   WiFi.softAP(ssid, password);
   delay(1000);
 
-  // Set AP IP
   WiFi.softAPConfig(apIP, apIP, netMsk);
+  dnsServer.start(DNS_PORT, "*", apIP);
 
   stopDefaultDHCPServer();
   xTaskCreate(dhcpServerTask, "dhcpServerTask", 4096, NULL, 1, NULL);
@@ -224,9 +227,10 @@ void setup() {
   });
   server.begin();
 
-  Serial.println("AP and web server started, custom minimal DHCP server running");
+  Serial.println("vibeDHCP Captive Portal running");
 }
 
 void loop() {
   server.handleClient();
+  dnsServer.processNextRequest();
 }
