@@ -87,7 +87,7 @@ int buildDHCPpacket(
 
   writeUInt32(0x0C, 0x00000000); // ciaddr
   writeUInt32(0x10, offeredIp);  // yiaddr
-  writeUInt32(0x14, serverIp);   // siaddr
+  writeUInt32(0x14, 0x00000000); // siaddr
   writeUInt32(0x18, 0x00000000); // giaddr
 
   writeBytes(0x1C, clientMac, 6); // chaddr
